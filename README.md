@@ -83,16 +83,20 @@ your-project/
 
 **This is the most important file.** The AI reads this at the start of EVERY session.
 
-Keep it **concise** - it should contain:
-- Brief project overview
-- Current status (what we're working on NOW)
-- Critical startup instructions (what files to read)
-- Critical rules (ALWAYS/NEVER)
-- Notes for next session
+The file is divided into two sections:
 
-**Detailed reference material goes in separate files** - conventions, build commands, structure docs.
+**User-Managed (top half)** - You set these up once and update rarely:
+- Project overview (what it does, tech stack, architecture)
+- Critical startup instructions (what files to read every session)
+- Critical rules (ALWAYS/NEVER constraints)
 
-**Keep it current.** Update "Current Status" and "Notes for Next Session" every session.
+**AI-Managed (bottom half)** - The AI updates these each session:
+- Current status (active feature, branch, progress)
+- Current feature context (what's done, what remains, key files)
+- Known issues & technical debt (with references to TANGENT_TASKS.md)
+- Notes for next session (continuity context)
+
+**Keep it concise.** Detailed reference material goes in separate files - conventions, build commands, structure docs. The AI-managed sections should be updated at the end of each session.
 
 ---
 
@@ -106,6 +110,12 @@ Your feature roadmap:
 - **Completed features** with commit references (for context)
 - **Current feature** in progress with status
 - **Upcoming features** with dependencies and priorities
+
+**Feature IDs**: Use `FEAT-X.Y` format (e.g., `FEAT-1.0`, `FEAT-2.0`). This provides:
+- Stable references that don't change if features are renamed
+- Insertion slots: `FEAT-1.5` can be added between `FEAT-1.0` and `FEAT-2.0`
+- Sub-features with letter suffix: `FEAT-2.0A`, `FEAT-2.0B`
+- Clear distinction from tangent IDs
 
 **When to create a new feature:**
 - Distinct piece of work with clear scope
@@ -123,16 +133,22 @@ Captures side discoveries without losing focus:
 - Priority and status
 - Enough context to pick it up later
 
+**Tangent IDs**: Use `TAN-XXX` format (e.g., `TAN-001`, `TAN-015`). This provides:
+- Stable references for tracking across sessions
+- Easy cross-referencing from CLAUDE.md's "Known Issues" section
+- Simple incrementing (no insertion slots needed - tangents aren't sequenced)
+- Clear distinction from feature IDs
+
 **Critical: The AI won't know it's in tangent territory.** You must recognize this and tell it. See [Example Scenarios](#example-scenarios) below.
 
 #### `SESSION_LOG.md`
-Historical record of session work:
+Historical record of session work, read at session start for context:
 - What was accomplished
 - What was discovered
 - Decisions made
 - Next steps identified
 
-Keeps recent sessions (5-10), archive older ones as needed.
+Keeps recent sessions (5-10), archive older ones as needed. This file is part of mandatory startup reading so the AI understands recent work history.
 
 ---
 
@@ -210,7 +226,7 @@ YOU: Great, let's document these architectural decisions. Create an
 AI:  [Creates architecture doc with decisions and rationale]
 
 YOU: Now let's create the initial feature plan. Based on our discussion,
-     I'm thinking Feature 1 is the database schema, Feature 2 is the core
+     I'm thinking FEAT-1.0 is the database schema, FEAT-2.0 is the core
      API endpoints...
 
 AI:  [Helps structure FEATURE_PLAN.md with features, dependencies, priorities]
@@ -230,19 +246,19 @@ AI:  Authentication typically involves several concerns: user registration,
 
      Option A: Single large feature "User Authentication"
      Option B: Split into smaller features:
-       - Feature 5: User Registration & Storage
-       - Feature 6: Session Management
-       - Feature 7: Password Reset Flow
-       - Feature 8: Role-Based Permissions
+       - FEAT-5.0: User Registration & Storage
+       - FEAT-6.0: Session Management
+       - FEAT-7.0: Password Reset Flow
+       - FEAT-8.0: Role-Based Permissions
 
      Option B gives cleaner review boundaries but more overhead...
 
-YOU: Let's go with Option B but combine 5 and 6 - registration and sessions
+YOU: Let's go with Option B but combine 5.0 and 6.0 - registration and sessions
      feel related. So three features total.
 
 AI:  That makes sense. Should I update FEATURE_PLAN.md with these three features?
-     I'll include the dependencies - it looks like Feature 5+6 needs to complete
-     before Feature 7 or 8 can start.
+     I'll include the dependencies - it looks like FEAT-5.0 needs to complete
+     before FEAT-7.0 or FEAT-8.0 can start.
 
 YOU: Yes, add them to the plan. Mark them as "Planned" status.
 
@@ -254,21 +270,21 @@ AI:  [Updates FEATURE_PLAN.md with new features, dependencies, and status]
 **This is critical.** The AI won't know it's going off-track. You must recognize it.
 
 ```
-[You're working on Feature 3: API Endpoints]
+[You're working on FEAT-3.0: API Endpoints]
 
 AI:  While implementing the /users endpoint, I noticed the error handling is
      inconsistent across the codebase. Some functions return error codes, others
      throw exceptions. Should I standardize this while I'm here?
 
-YOU: Stop - that's a tangent. We're working on Feature 3 (API Endpoints), not
+YOU: Stop - that's a tangent. We're working on FEAT-3.0 (API Endpoints), not
      error handling standardization. Add this to TANGENT_TASKS.md with a
-     breadcrumb back to Feature 3, then continue with the endpoint work.
+     breadcrumb back to FEAT-3.0, then continue with the endpoint work.
 
 AI:  You're right, I'll document that tangent.
 
      [Adds to TANGENT_TASKS.md:]
-     ### Error Handling Standardization
-     **Origin Feature**: Feature 3 - API Endpoints
+     ### TAN-001: Error Handling Standardization
+     **Origin Feature**: FEAT-3.0 - API Endpoints
      **Description**: Inconsistent error handling patterns discovered...
      **Priority**: Medium
      **Status**: Discovered
@@ -282,21 +298,20 @@ Sometimes tangents are urgent enough to address immediately.
 
 ```
 YOU: I saw the tangent you logged about error handling. Before we continue with
-     Feature 3, I want to address this - inconsistent errors will cause problems
-     later. Let's pause Feature 3 and work on this tangent.
+     FEAT-3.0, I want to address this - inconsistent errors will cause problems
+     later. Let's pause FEAT-3.0 and work on this tangent.
 
 AI:  Understood. Should I create a new feature for this, or treat it as a
      quick tangent fix?
 
-YOU: It's significant enough for its own feature. Create Feature 3.5: Error
-     Handling Standardization in the plan, mark Feature 3 as "Paused", and
+YOU: It's significant enough for its own feature. Create FEAT-3.5: Error
+     Handling Standardization in the plan, mark FEAT-3.0 as "Paused", and
      update the tangent entry to show it's being addressed.
 
-AI:  [Updates FEATURE_PLAN.md - adds Feature 3.5, marks Feature 3 as Paused]
-     [Updates TANGENT_TASKS.md - marks error handling tangent as "In Progress
-      as Feature 3.5"]
+AI:  [Updates FEATURE_PLAN.md - adds FEAT-3.5, marks FEAT-3.0 as Paused]
+     [Updates TANGENT_TASKS.md - marks TAN-001 as "Converted to FEAT-3.5"]
 
-     Ready to start Feature 3.5. Should I propose a 10K foot view of the
+     Ready to start FEAT-3.5. Should I propose a 10K foot view of the
      error handling standardization?
 
 YOU: Yes, let's see the plan.
@@ -313,15 +328,15 @@ AI:  [Reads CLAUDE.md and required files]
 
      Based on my review:
 
-     **Last completed**: Feature 7 (Password Reset) - merged in commit abc123
-     **Currently in progress**: Feature 8 (Role-Based Permissions)
+     **Last completed**: FEAT-7.0 (Password Reset) - merged in commit abc123
+     **Currently in progress**: FEAT-8.0 (Role-Based Permissions)
        - Branch: feature/role-permissions
        - Status: Implementation 60% complete, paused at middleware integration
      **Outstanding tangents**:
-       - Database index optimization (from Feature 6, low priority)
-       - Logging verbosity config (from Feature 7, medium priority)
+       - TAN-002: Database index optimization (from FEAT-6.0, low priority)
+       - TAN-003: Logging verbosity config (from FEAT-7.0, medium priority)
 
-     The Feature 8 branch has uncommitted changes. Want me to summarize
+     The FEAT-8.0 branch has uncommitted changes. Want me to summarize
      what's there and what remains?
 
 YOU: Yes, and check if the branch is still in sync with main.
@@ -377,54 +392,32 @@ Feature branches + squash merging means your main branch tells a clear story.
 
 ## Workflow Overview
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     FEATURE DEVELOPMENT                         │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│   ┌──────────┐    ┌──────────┐    ┌──────────┐                  │
-│   │ 1. Plan  │───>│ 2. Branch│───>│ 3. Build │                  │
-│   │ (10K ft) │    │          │    │          │                  │
-│   └──────────┘    └──────────┘    └────┬─────┘                  │
-│       │                               │                         │
-│       │ Approval                      │                         │
-│       │ Gate                          v                         │
-│       │                         ┌──────────┐                    │
-│       │                         │ 4. Commit│                    │
-│       │                         └────┬─────┘                    │
-│       │                              │                          │
-│       │                              v                          │
-│       │                         ┌───────────┐                   │
-│       │              ┌─────────>│ 5. Iterate│──────────┐        │
-│       │              │          └───────────┘          │        │
-│       │              │               │                 │        │
-│       │              │ More work     │ Done            │        │
-│       │              │ needed        v                 │        │
-│       │              │          ┌──────────┐           │        │
-│       │              │          │ 6. Squash│           │        │
-│       │              │          └────┬─────┘           │        │
-│       │              │               │                 │        │
-│       │              │               v                 │        │
-│       │              │          ┌──────────┐           │        │
-│       │              │          │ 7. Review│           │        │
-│       │              │          └────┬─────┘           │        │
-│       │              │               │                 │        │
-│       │              │               │ Approval        │        │
-│       │              │               │ Gate            │        │
-│       │              │               v                 │        │
-│       │              │          ┌────────────┐         │        │
-│       │              └──────────│ 8. Feedback│─────────┘        │
-│       │               Changes   └────┬───────┘                  │
-│       │               requested      │ Approved                 │
-│       │                              v                          │
-│       │                         ┌──────────┐                    │
-│       │                         │ 9. Merge │                    │
-│       │                         └──────────┘                    │
-│       │                              │                          │
-│       │                              v                          │
-│       └─────────────────────> Update FEATURE_PLAN.md            │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph FEATURE_DEVELOPMENT[" "]
+        Plan["1. Plan<br/>(10K ft view)"]
+        Branch["2. Branch"]
+        Build["3. Build"]
+        Commit["4. Commit"]
+        Iterate["5. Iterate"]
+        Squash["6. Squash"]
+        Review["7. Review"]
+        Feedback["8. Feedback"]
+        Merge["9. Merge"]
+        Update["Update FEATURE_PLAN.md"]
+
+        Plan -->|"✓ Approval<br/>Gate"| Branch
+        Branch --> Build
+        Build --> Commit
+        Commit --> Iterate
+        Iterate -->|"More work<br/>needed"| Build
+        Iterate -->|"Done"| Squash
+        Squash --> Review
+        Review -->|"✓ Approval<br/>Gate"| Feedback
+        Feedback -->|"Changes<br/>requested"| Build
+        Feedback -->|"Approved"| Merge
+        Merge --> Update
+    end
 ```
 
 ---
@@ -531,9 +524,12 @@ This template is a starting point. Adapt it to your needs:
 
 ## License
 
-This template is released under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).
+This template is released under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) with a clarification:
 
-Use it, modify it, share it - just give credit. See `LICENSE` for details.
+- **Forking/redistributing the template**: Attribution required
+- **Using the template in your own project**: No attribution needed
+
+Think of this like a compiler - you don't credit the tool in your output. Copy these files into your project and use the workflow freely. See `LICENSE` for details.
 
 ---
 

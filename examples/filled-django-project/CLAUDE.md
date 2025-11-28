@@ -29,6 +29,7 @@ ShopFlow is a Django-based e-commerce platform for small to medium businesses. I
 1. `docs/process/FEATURE_WORKFLOW.md` - Development process
 2. `docs/process/FEATURE_PLAN.md` - Current feature roadmap
 3. `docs/process/TANGENT_TASKS.md` - Outstanding tangents
+4. `docs/process/SESSION_LOG.md` - Recent session history
 
 **Reference as needed:**
 - `docs/reference/CONVENTIONS.md` - Coding patterns and PEP 8 overrides
@@ -74,17 +75,12 @@ ShopFlow is a Django-based e-commerce platform for small to medium businesses. I
 
 ## Current Status
 
-- **Active Feature**: Feature 7 - Stripe Payment Integration
+- **Active Feature**: FEAT-7.0 - Stripe Payment Integration
 - **Branch**: `feature/stripe-payments`
 - **Progress**: Webhook handling complete, checkout flow 80% done
 - **Last Session**: 2024-01-15 - Implemented Stripe webhook signature verification and payment intent creation
 
-### Recent Completions
-- Feature 6: Order Status Emails (merged 2024-01-12)
-- Feature 5: Inventory Tracking (merged 2024-01-08)
-- Feature 4: Shopping Cart Persistence (merged 2024-01-03)
-
-## Current Feature Context (Feature 7)
+## Current Feature Context
 
 ### What's Done:
 - Stripe account configuration and API key management
@@ -110,21 +106,21 @@ ShopFlow is a Django-based e-commerce platform for small to medium businesses. I
 ## Known Issues & Technical Debt
 
 1. **Cart expiration** - Carts don't expire, may accumulate stale data
-   - Tracked in: TANGENT_TASKS.md (T-012)
+   - Tracked in: TANGENT_TASKS.md (TAN-012)
    - Priority: Low (address in Phase 3)
 
 2. **N+1 queries in product list** - Need to add `select_related`
-   - Tracked in: TANGENT_TASKS.md (T-015)
+   - Tracked in: TANGENT_TASKS.md (TAN-015)
    - Priority: Medium (performance impact)
 
 3. **Missing index on orders.status** - Slow queries on order filtering
-   - Tracked in: TANGENT_TASKS.md (T-018)
+   - Tracked in: TANGENT_TASKS.md (TAN-018)
    - Priority: Medium (add migration)
 
 ## Notes for Next Session
 
-- **Continue Feature 7**: Start with frontend Stripe Elements integration
+- **Continue FEAT-7.0**: Start with frontend Stripe Elements integration
 - **Test file to reference**: `apps/payments/tests/test_checkout.py` has test payment intents
 - **Stripe test cards**: Use `4242424242424242` for success, `4000000000000002` for decline
 - **Remember**: Webhook endpoint must return 200 quickly, do heavy processing in Celery task
-- **TODO**: After Feature 7, revisit T-015 (N+1 queries) before starting Feature 8
+- **TODO**: After FEAT-7.0, revisit TAN-015 (N+1 queries) before starting FEAT-8.0

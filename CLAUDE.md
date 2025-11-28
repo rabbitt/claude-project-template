@@ -29,6 +29,7 @@
 1. `docs/process/FEATURE_WORKFLOW.md` - Development process
 2. `docs/process/FEATURE_PLAN.md` - Current feature roadmap
 3. `docs/process/TANGENT_TASKS.md` - Outstanding tangents
+4. `docs/process/SESSION_LOG.md` - Recent session history
 
 **Reference as needed:**
 - `docs/reference/CONVENTIONS.md` - Coding patterns
@@ -65,7 +66,7 @@
 
 ## Current Status
 
-- **Active Feature**: [Feature name and number]
+- **Active Feature**: FEAT-X.Y - [Feature name]
 - **Branch**: `feature/[branch-name]`
 - **Progress**: [Brief status - what's done, what remains]
 - **Last Session**: [Date] - [One-line summary]
@@ -90,7 +91,7 @@
 <!-- Track issues discovered during development, reference TANGENT_TASKS.md -->
 
 1. **[Issue name]** - [Brief description]
-   - Tracked in: TANGENT_TASKS.md ([ID])
+   - Tracked in: TANGENT_TASKS.md (TAN-XXX)
    - Priority: [Low/Medium/High]
 
 ## Notes for Next Session

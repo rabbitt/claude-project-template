@@ -2,15 +2,27 @@
 
 Tangents discovered during feature development. Each includes a breadcrumb back to where we were when it was discovered.
 
-## Active Tangents
+## ID Convention
 
-### T-015: N+1 Query in Product List View
-**Discovered During**: Feature 5 (Inventory Tracking)
+Tangents use `TAN-XXX` format (simple increment): `TAN-001`, `TAN-002`, `TAN-003`
+
+When a tangent is converted to a feature, mark it as "Converted to FEAT-X.Y" in the resolution.
+
+---
+
+## Current Tangents
+
+### TAN-015: N+1 Query in Product List View
+**Origin Feature**: FEAT-5.0 (Inventory Tracking)
+**Discovered**: 2024-01-08
 **Breadcrumb**: Was adding inventory counts to product list when noticed N+1 on category lookups
 **Priority**: Medium
-**Impact**: Performance - each product triggers separate category query
+**Status**: Discovered
 
-**Problem:**
+**Description**:
+Each product triggers a separate category query when rendering the product list.
+
+**Context**:
 ```python
 # apps/products/selectors.py - line 24
 def get_products_for_category(category_id: int) -> QuerySet[Product]:
@@ -18,25 +30,34 @@ def get_products_for_category(category_id: int) -> QuerySet[Product]:
     # Missing: .select_related('category').prefetch_related('images')
 ```
 
-**Solution:**
+**Suggested Action**:
 Add `select_related` and `prefetch_related` to product querysets.
 
-**Notes:**
-- Affects: `ProductListView`, `CategoryDetailView`, API endpoints
+**Affected Areas**:
+- `ProductListView`
+- `CategoryDetailView`
+- API endpoints
+
+**Notes**:
 - Test with Django Debug Toolbar to verify fix
+- Should be addressed before FEAT-8.0 (more list views)
 
 ---
 
-### T-018: Missing Index on orders.status
-**Discovered During**: Feature 6 (Order Status Emails)
+### TAN-018: Missing Index on orders.status
+**Origin Feature**: FEAT-6.0 (Order Status Emails)
+**Discovered**: 2024-01-12
 **Breadcrumb**: Was querying pending orders for email batch when noticed slow query
 **Priority**: Medium
-**Impact**: Performance - status filtering does full table scan
+**Status**: Discovered
 
-**Problem:**
-Order filtering by status is common (admin dashboard, email batches) but no index exists.
+**Description**:
+Order filtering by status does full table scan. Status filtering is common (admin dashboard, email batches).
 
-**Solution:**
+**Context**:
+Query plan showed sequential scan on orders table when filtering by status.
+
+**Suggested Action**:
 ```python
 # Migration needed
 class Migration(migrations.Migration):
@@ -48,73 +69,93 @@ class Migration(migrations.Migration):
     ]
 ```
 
-**Notes:**
+**Notes**:
 - Also consider composite index on (status, created_at) for date-filtered queries
+- Can be combined with any upcoming migration
 
 ---
 
-### T-012: Cart Expiration Not Implemented
-**Discovered During**: Feature 4 (Cart Persistence)
+### TAN-012: Cart Expiration Not Implemented
+**Origin Feature**: FEAT-4.0 (Cart Persistence)
+**Discovered**: 2024-01-03
 **Breadcrumb**: Finished guest cart persistence, realized carts never expire
 **Priority**: Low
-**Impact**: Data - stale carts accumulate in database
+**Status**: Discovered
 
-**Problem:**
-Guest carts are created with session keys but never cleaned up when sessions expire.
+**Description**:
+Guest carts are created with session keys but never cleaned up when sessions expire. Will accumulate stale data over time.
 
-**Solution Options:**
-1. Celery periodic task to delete old carts
-2. Database trigger / scheduled job
+**Context**:
+- Carts table will grow indefinitely
+- No impact on users, just data hygiene
+
+**Suggested Action Options**:
+1. Celery periodic task to delete old carts (preferred)
+2. Database scheduled job
 3. Lazy cleanup on cart access
 
-**Notes:**
-- Consider: 30-day expiration for guest carts, never for logged-in users
-- Need to handle cart→order conversion (don't delete if order pending)
-- Low priority - not user-facing, just data hygiene
+**Notes**:
+- Consider 30-day expiration for guest carts
+- Don't delete if cart has pending order
+- Low priority - not user-facing
 
 ---
 
-## Resolved Tangents
+## Completed Tangents
 
-### T-011: Decimal Precision for Prices ✅
-**Discovered During**: Feature 3 (Shopping Cart)
-**Resolved**: Feature 5 (Inventory Tracking)
-**Resolution**: Standardized on `DecimalField(max_digits=10, decimal_places=2)`
+### TAN-011: Decimal Precision for Prices ✅
+**Origin Feature**: FEAT-3.0 (Shopping Cart)
+**Resolved**: 2024-01-08 (during FEAT-5.0)
+**Resolution**: Fixed as part of inventory tracking work
 
----
+**Original Issue**:
+Inconsistent decimal precision for price fields across models.
 
-### T-008: Email Template Duplication ✅
-**Discovered During**: Feature 6 (Order Status Emails)
-**Resolved**: Same feature
-**Resolution**: Created `templates/emails/base.html` for shared layout
-
----
-
-### T-005: Inconsistent Error Response Format ✅
-**Discovered During**: Feature 2 (Product Catalog)
-**Resolved**: Feature 4 (Cart Persistence)
-**Resolution**: Created `apps/core/exceptions.py` with standard error handler
+**How Resolved**:
+Standardized on `DecimalField(max_digits=10, decimal_places=2)` across all price/money fields.
 
 ---
 
-## Tangent Categories
+### TAN-008: Email Template Duplication ✅
+**Origin Feature**: FEAT-6.0 (Order Status Emails)
+**Resolved**: 2024-01-12 (same feature)
+**Resolution**: Fixed during feature implementation
 
-| Category | Count | Priority Focus |
-|----------|-------|----------------|
-| Performance | 2 | T-015, T-018 (address before Phase 3) |
-| Data Hygiene | 1 | T-012 (low priority) |
-| Code Quality | 0 | - |
-| Security | 0 | - |
+**Original Issue**:
+Each email template had duplicated header/footer HTML.
 
-## When to Address Tangents
+**How Resolved**:
+Created `templates/emails/base.html` with shared layout. All email templates now extend base.
 
-- **Between features**: Good time to knock out medium-priority tangents
-- **Performance issues**: Address before they compound
-- **Security issues**: Address immediately (none currently)
-- **Low priority**: Batch together when convenient
+---
 
-## Notes
+### TAN-005: Inconsistent Error Response Format ✅
+**Origin Feature**: FEAT-2.0 (Product Catalog)
+**Resolved**: 2024-01-03 (during FEAT-4.0)
+**Resolution**: Converted to standard fix
 
-- T-015 should be addressed after Feature 7, before Feature 8
-- T-018 can be combined with any migration work
-- T-012 can wait until Phase 3 or later
+**Original Issue**:
+API endpoints returned errors in different formats (some with `error` key, some with `detail`).
+
+**How Resolved**:
+Created `apps/core/exceptions.py` with custom exception handler. All API errors now use consistent format with `error`, `code`, and optional `details` fields.
+
+---
+
+## Deferred Tangents
+
+*No deferred tangents.*
+
+---
+
+## Summary
+
+| Category | Count | IDs |
+|----------|-------|-----|
+| Performance | 2 | TAN-015, TAN-018 |
+| Data Hygiene | 1 | TAN-012 |
+
+**Recommended order**:
+1. TAN-015 (N+1 queries) - Address after FEAT-7.0, before FEAT-8.0
+2. TAN-018 (index) - Can be done with any migration
+3. TAN-012 (cart cleanup) - Low priority, Phase 3+

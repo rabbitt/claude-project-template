@@ -1,178 +1,184 @@
 # ShopFlow Architecture Decisions
 
-## ADR-001: Payment Provider Selection
+## Decision Log
 
-**Date:** 2024-01-10
-**Status:** Accepted
-**Context:** Need to integrate payment processing for checkout.
+### ADR-006: Category Tree Structure
+**Date**: 2023-11-28
+**Status**: Accepted
 
-**Decision:** Use Stripe as the payment provider.
+**Context**:
+Products need hierarchical categories (Electronics > Phones > Smartphones). Need efficient queries for ancestors, descendants, and tree rendering.
 
-**Alternatives Considered:**
-- **PayPal**: Wider consumer recognition, but worse developer experience and webhook reliability
-- **Square**: Good for in-person, less mature for online-only
-- **Braintree**: Owned by PayPal, similar issues
+**Decision**:
+Use django-mptt for category tree structure.
 
-**Rationale:**
-- Best-in-class documentation and developer experience
-- Reliable webhook delivery with built-in retry logic
-- Strong support for subscriptions if we add them later
-- Global coverage for international expansion
-- Stripe Elements for PCI-compliant frontend
+**Alternatives Considered**:
+- **Adjacency list**: Simple parent_id foreign key. Rejected because inefficient for tree queries (multiple joins for ancestors/descendants).
+- **django-treebeard**: Similar to MPTT with different algorithms. Rejected because less popular, smaller community.
+- **Closure table**: Stores all ancestor-descendant pairs. Rejected because complex writes and more storage overhead.
 
-**Consequences:**
-- Stripe fees (~2.9% + $0.30 per transaction)
-- Must implement webhook signature verification
-- Need to handle idempotency for retries
-
----
-
-## ADR-002: Background Task Queue
-
-**Date:** 2023-11-25
-**Status:** Accepted
-**Context:** Need async processing for emails, payment callbacks, inventory updates.
-
-**Decision:** Use Celery with Redis as the broker.
-
-**Alternatives Considered:**
-- **Django-Q**: Simpler, but less mature ecosystem
-- **Dramatiq**: Modern, but smaller community
-- **RQ (Redis Queue)**: Simpler, but fewer features
-
-**Rationale:**
-- Battle-tested at scale
-- Excellent Django integration
-- Celery Beat for scheduled tasks
-- Large ecosystem of monitoring tools (Flower)
-- Team familiarity
-
-**Consequences:**
-- Redis dependency (but we use it for caching anyway)
-- More complex deployment (worker processes)
-- Need to handle task failures and retries
-
----
-
-## ADR-003: Frontend Approach
-
-**Date:** 2023-11-20
-**Status:** Accepted
-**Context:** Need interactive frontend without SPA complexity.
-
-**Decision:** Use HTMX + Alpine.js with Django templates.
-
-**Alternatives Considered:**
-- **React SPA**: Full interactivity, but adds build complexity and API-first architecture
-- **Vue.js**: Similar to React concerns
-- **Hotwire/Turbo**: Good, but less Django-native than HTMX
-
-**Rationale:**
-- Progressive enhancement - works without JS
-- No build step required
-- Server-rendered = better SEO
-- Django templates stay the source of truth
-- Minimal JS knowledge required
-- Fast development velocity
-
-**Consequences:**
-- Less suitable for highly interactive features
-- Team needs to learn HTMX patterns
-- Some complex interactions may need custom JS
-
----
-
-## ADR-004: Authentication System
-
-**Date:** 2023-11-20
-**Status:** Accepted
-**Context:** Need user registration, login, OAuth, password reset.
-
-**Decision:** Use django-allauth.
-
-**Alternatives Considered:**
-- **Custom implementation**: Full control, but reinventing the wheel
-- **django-rest-auth**: DRF-focused, but less maintained
-- **dj-rest-auth**: Fork of above, API-only focus
-
-**Rationale:**
-- Handles OAuth providers (Google, GitHub, etc.)
-- Email verification built-in
-- Password reset flows
-- Well-maintained, large community
-- Works with both templates and API
-
-**Consequences:**
-- Additional dependency
-- Must customize templates for our design
-- Some complexity in configuration
-
----
-
-## ADR-005: Service Layer Pattern
-
-**Date:** 2023-11-20
-**Status:** Accepted
-**Context:** Need clear separation between views and business logic.
-
-**Decision:** Implement service layer pattern with `services.py` and `selectors.py`.
-
-**Alternatives Considered:**
-- **Fat models**: Django convention, but models become bloated
-- **Fat views**: Quick, but untestable and duplicated logic
-- **Domain-driven design**: Overkill for current scale
-
-**Rationale:**
-- Clear separation of concerns
-- Services are easy to test in isolation
-- Reusable across views, management commands, tasks
-- Selectors optimize query patterns in one place
-
-**Consequences:**
-- More files per app
-- Team needs to follow the pattern consistently
-- Some overhead for simple CRUD
-
----
-
-## ADR-006: Category Tree Structure
-
-**Date:** 2023-11-28
-**Status:** Accepted
-**Context:** Products need hierarchical categories (Electronics > Phones > Smartphones).
-
-**Decision:** Use django-mptt for category tree.
-
-**Alternatives Considered:**
-- **Adjacency list**: Simple, but inefficient for tree queries
-- **django-treebeard**: Similar to MPTT, less popular
-- **Closure table**: Faster reads, complex writes
-
-**Rationale:**
-- Efficient ancestor/descendant queries
-- Well-documented Django integration
-- `get_ancestors()`, `get_descendants()` methods
+**Consequences**:
+- Efficient `get_ancestors()`, `get_descendants()` methods
 - Template tags for rendering trees
-
-**Consequences:**
 - MPTT fields add complexity to migrations
 - Tree must be rebuilt if corrupted
 - Write operations slightly slower (tree rebalancing)
 
 ---
 
+### ADR-005: Service Layer Pattern
+**Date**: 2023-11-20
+**Status**: Accepted
+
+**Context**:
+Need clear separation between views and business logic. Views were becoming bloated with business rules.
+
+**Decision**:
+Implement service layer pattern with `services.py` (writes) and `selectors.py` (reads) in each app.
+
+**Alternatives Considered**:
+- **Fat models**: Put logic in model methods. Rejected because models become bloated and hard to test.
+- **Fat views**: Keep logic in views. Rejected because untestable, logic gets duplicated across views.
+- **Domain-driven design**: Full DDD with aggregates, repositories. Rejected because overkill for current project scale.
+
+**Consequences**:
+- Clear separation of concerns
+- Services are easy to test in isolation
+- Reusable across views, management commands, Celery tasks
+- Selectors optimize query patterns in one place
+- More files per app (overhead for simple CRUD)
+- Team needs to follow the pattern consistently
+
+---
+
+### ADR-004: Authentication System
+**Date**: 2023-11-20
+**Status**: Accepted
+
+**Context**:
+Need user registration, login, OAuth providers, email verification, and password reset flows.
+
+**Decision**:
+Use django-allauth for authentication.
+
+**Alternatives Considered**:
+- **Custom implementation**: Build from scratch. Rejected because reinventing the wheel, security risk.
+- **django-rest-auth**: DRF-focused auth. Rejected because less maintained, API-only focus.
+- **dj-rest-auth**: Fork of django-rest-auth. Rejected because same API-only limitations.
+
+**Consequences**:
+- Handles OAuth providers (Google, GitHub, etc.) out of the box
+- Email verification and password reset built-in
+- Well-maintained with large community
+- Works with both templates and API
+- Additional dependency to manage
+- Must customize templates for our design
+
+---
+
+### ADR-003: Frontend Approach
+**Date**: 2023-11-20
+**Status**: Accepted
+
+**Context**:
+Need interactive frontend without SPA complexity. Team has Django experience but limited frontend framework experience.
+
+**Decision**:
+Use HTMX + Alpine.js with Django templates (server-rendered with progressive enhancement).
+
+**Alternatives Considered**:
+- **React SPA**: Full client-side interactivity. Rejected because adds build complexity, requires API-first architecture, team learning curve.
+- **Vue.js SPA**: Similar to React. Rejected because same concerns about complexity and learning curve.
+- **Hotwire/Turbo**: Rails-originated approach. Rejected because less Django-native than HTMX, smaller Django community.
+
+**Consequences**:
+- Progressive enhancement - works without JavaScript
+- No build step required for frontend
+- Server-rendered HTML = better SEO
+- Django templates stay the source of truth
+- Minimal JavaScript knowledge required
+- Fast development velocity
+- Less suitable for highly interactive features
+- Some complex interactions may need custom JavaScript
+
+---
+
+### ADR-002: Background Task Queue
+**Date**: 2023-11-25
+**Status**: Accepted
+
+**Context**:
+Need async processing for emails, payment callbacks, inventory updates. Requests shouldn't block on slow operations.
+
+**Decision**:
+Use Celery with Redis as the message broker.
+
+**Alternatives Considered**:
+- **Django-Q**: Simpler setup, Django-native. Rejected because less mature ecosystem, fewer monitoring tools.
+- **Dramatiq**: Modern, type-hinted API. Rejected because smaller community, less Django integration documentation.
+- **RQ (Redis Queue)**: Simple Redis-based queue. Rejected because fewer features (no scheduled tasks, limited monitoring).
+
+**Consequences**:
+- Battle-tested at scale
+- Excellent Django integration
+- Celery Beat for scheduled tasks
+- Large ecosystem of monitoring tools (Flower)
+- Redis dependency (but we use it for caching anyway)
+- More complex deployment (worker processes)
+- Need to handle task failures and retries
+
+---
+
+### ADR-001: Payment Provider Selection
+**Date**: 2024-01-10
+**Status**: Accepted
+
+**Context**:
+Need to integrate payment processing for checkout. Must handle credit cards, support webhooks for async events, be PCI compliant.
+
+**Decision**:
+Use Stripe as the payment provider.
+
+**Alternatives Considered**:
+- **PayPal**: Wider consumer recognition. Rejected because worse developer experience, unreliable webhooks, complex integration.
+- **Square**: Good for in-person payments. Rejected because less mature for online-only, limited international support.
+- **Braintree**: PayPal-owned, similar features. Rejected because same webhook reliability concerns as PayPal.
+
+**Consequences**:
+- Best-in-class documentation and developer experience
+- Reliable webhook delivery with built-in retry logic
+- Strong support for subscriptions if we add them later
+- Global coverage for international expansion
+- Stripe Elements for PCI-compliant frontend
+- Stripe fees (~2.9% + $0.30 per transaction)
+- Must implement webhook signature verification
+- Need to handle idempotency for retries
+
+---
+
 ## Pending Decisions
 
-### Session Storage (Feature 8+)
+### Session Storage (FEAT-8.0+)
 Currently using database-backed sessions. May need Redis sessions for multi-server deployment. Decision deferred until scaling requirements are clearer.
 
 ---
 
-## Change Log
+## Index by Category
 
-| Date | ADR | Change |
-|------|-----|--------|
-| 2024-01-10 | ADR-001 | Added payment provider decision |
-| 2023-11-28 | ADR-006 | Added category tree decision |
-| 2023-11-25 | ADR-002 | Added Celery decision |
-| 2023-11-20 | ADR-003,004,005 | Initial architecture decisions |
+### Infrastructure
+- [ADR-002: Background Task Queue](#adr-002-background-task-queue)
+
+### Data Model
+- [ADR-006: Category Tree Structure](#adr-006-category-tree-structure)
+
+### API Design
+- [ADR-005: Service Layer Pattern](#adr-005-service-layer-pattern)
+
+### Frontend
+- [ADR-003: Frontend Approach](#adr-003-frontend-approach)
+
+### Authentication
+- [ADR-004: Authentication System](#adr-004-authentication-system)
+
+### Payments
+- [ADR-001: Payment Provider Selection](#adr-001-payment-provider-selection)

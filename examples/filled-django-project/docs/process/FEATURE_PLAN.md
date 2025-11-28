@@ -1,5 +1,16 @@
 # ShopFlow Feature Plan
 
+## ID Conventions
+
+**Features** use `FEAT-X.Y` format with optional letter suffix for sub-features:
+- `FEAT-1.0`, `FEAT-2.0`, `FEAT-3.0` for main features
+- `FEAT-1.5` for insertions (e.g., tangent converted to feature between 1.0 and 2.0)
+- `FEAT-2.0A`, `FEAT-2.0B` for sub-features
+
+**Tangents** use `TAN-XXX` format (simple increment):
+- `TAN-001`, `TAN-002`, `TAN-003`
+- When converted to a feature, mark as "Converted to FEAT-X.Y"
+
 ## Commit Conventions
 
 ```
@@ -11,111 +22,158 @@ test:     Test additions or modifications
 chore:    Build, config, dependency updates
 ```
 
-## Feature Roadmap
+---
 
-### Phase 1: Core E-commerce (Complete)
+## Completed Features
 
-- [x] **Feature 1**: User Registration & Authentication
-  - Status: ✅ Merged (2023-11-20)
-  - Branch: `feature/user-auth`
-  - Commits: 12
+### FEAT-1.0: User Registration & Authentication ✅
+**Branch**: `feature/user-auth` (merged)
+**Commit**: `a1b2c3d`
+**Completed**: 2023-11-20
+**Summary**: User registration, login, OAuth providers via django-allauth
 
-- [x] **Feature 2**: Product Catalog & Categories
-  - Status: ✅ Merged (2023-11-28)
-  - Branch: `feature/product-catalog`
-  - Commits: 18
+---
 
-- [x] **Feature 3**: Basic Shopping Cart
-  - Status: ✅ Merged (2023-12-10)
-  - Branch: `feature/shopping-cart`
-  - Commits: 14
+### FEAT-2.0: Product Catalog & Categories ✅
+**Branch**: `feature/product-catalog` (merged)
+**Commit**: `e4f5g6h`
+**Completed**: 2023-11-28
+**Summary**: Product models, category tree with django-mptt, admin interface
 
-### Phase 2: Order Processing (In Progress)
+---
 
-- [x] **Feature 4**: Cart Persistence (Guest & Logged-in)
-  - Status: ✅ Merged (2024-01-03)
-  - Branch: `feature/cart-persistence`
-  - Commits: 9
+### FEAT-3.0: Basic Shopping Cart ✅
+**Branch**: `feature/shopping-cart` (merged)
+**Commit**: `i7j8k9l`
+**Completed**: 2023-12-10
+**Summary**: Cart model, add/remove items, quantity updates, cart display
 
-- [x] **Feature 5**: Inventory Tracking
-  - Status: ✅ Merged (2024-01-08)
-  - Branch: `feature/inventory`
-  - Commits: 11
+---
 
-- [x] **Feature 6**: Order Status Emails
-  - Status: ✅ Merged (2024-01-12)
-  - Branch: `feature/order-emails`
-  - Commits: 8
+### FEAT-4.0: Cart Persistence ✅
+**Branch**: `feature/cart-persistence` (merged)
+**Commit**: `m0n1o2p`
+**Completed**: 2024-01-03
+**Summary**: Guest cart via sessions, cart merging on login
 
-- [ ] **Feature 7**: Stripe Payment Integration 🔄 ACTIVE
-  - Status: 🔄 In Progress (80%)
-  - Branch: `feature/stripe-payments`
-  - Started: 2024-01-13
-  - What's Done:
-    - ✅ Stripe API configuration
-    - ✅ Payment Intent creation
-    - ✅ Webhook signature verification
-    - ✅ Success/failure handling
-  - What Remains:
-    - ⬜ Frontend Stripe Elements
-    - ⬜ Refund handling
-    - ⬜ Receipt emails
-    - ⬜ Integration tests
+---
 
-- [ ] **Feature 8**: Order History & Reordering
-  - Status: 📋 Planned
-  - Dependencies: Feature 7 (payments)
-  - Estimate: Medium complexity
+### FEAT-5.0: Inventory Tracking ✅
+**Branch**: `feature/inventory` (merged)
+**Commit**: `q3r4s5t`
+**Completed**: 2024-01-08
+**Summary**: Stock quantities, optimistic locking, low stock alerts
 
-### Phase 3: Customer Experience (Planned)
+---
 
-- [ ] **Feature 9**: Product Reviews & Ratings
-  - Status: 📋 Planned
-  - Dependencies: None
+### FEAT-6.0: Order Status Emails ✅
+**Branch**: `feature/order-emails` (merged)
+**Commit**: `u6v7w8x`
+**Completed**: 2024-01-12
+**Summary**: Email templates, Celery tasks for async sending, base template
 
-- [ ] **Feature 10**: Wishlist Functionality
-  - Status: 📋 Planned
-  - Dependencies: None
+---
 
-- [ ] **Feature 11**: Discount Codes & Promotions
-  - Status: 📋 Planned
-  - Dependencies: Feature 7 (payment integration)
+## Current Feature
 
-- [ ] **Feature 12**: Search with Filters
-  - Status: 📋 Planned
-  - Dependencies: Feature 2 (product catalog)
+### FEAT-7.0: Stripe Payment Integration
+**Branch**: `feature/stripe-payments`
+**Status**: 🔄 In Progress (80%)
+**Priority**: High
+**Dependencies**: FEAT-4.0 (cart), FEAT-5.0 (inventory)
 
-### Phase 4: Admin & Operations (Future)
+**Scope**:
+- Payment Intent creation and handling
+- Webhook endpoint with signature verification
+- Frontend checkout with Stripe Elements
+- Refund handling
+- Receipt emails
 
-- [ ] **Feature 13**: Sales Dashboard
-- [ ] **Feature 14**: Bulk Product Import
-- [ ] **Feature 15**: Shipping Integration
+**Progress**:
+- [x] Stripe API configuration
+- [x] Payment Intent creation endpoint
+- [x] Webhook signature verification
+- [x] Success/failure event handling
+- [ ] Frontend Stripe Elements integration
+- [ ] Refund webhook handling
+- [ ] Receipt email trigger
+- [ ] Integration tests
 
-## Current Sprint Focus
+---
 
-**Sprint 5 (Jan 8-22, 2024):**
-- Primary: Feature 7 - Stripe Payment Integration
-- Secondary: Address T-015 (N+1 query fix)
+## Planned Features
 
-## Architecture Notes
+### FEAT-8.0: Order History & Reordering
+**Priority**: High
+**Dependencies**: FEAT-7.0
+**Estimated Effort**: Medium
 
-Key decisions made during feature development:
+**Scope**:
+- Order history page for customers
+- Order detail view
+- "Reorder" functionality (add previous order items to cart)
 
-| Feature | Decision | Rationale |
-|---------|----------|-----------|
-| F1 | django-allauth for auth | Handles OAuth, email verify, password reset |
-| F2 | MPTT for categories | Efficient tree queries for nested categories |
-| F5 | Optimistic locking | Prevent race conditions in inventory updates |
-| F6 | Celery for emails | Don't block request on SMTP |
-| F7 | Stripe over PayPal | Better API, webhook reliability |
+---
+
+### FEAT-9.0: Product Reviews & Ratings
+**Priority**: Medium
+**Dependencies**: FEAT-1.0, FEAT-2.0
+**Estimated Effort**: Medium
+
+**Scope**:
+- Review submission form
+- Star ratings
+- Review moderation in admin
+- Average rating display on products
+
+---
+
+### FEAT-10.0: Wishlist Functionality
+**Priority**: Medium
+**Dependencies**: FEAT-1.0, FEAT-2.0
+**Estimated Effort**: Small
+
+**Scope**:
+- Add to wishlist button
+- Wishlist page
+- Move to cart functionality
+
+---
+
+### FEAT-11.0: Discount Codes & Promotions
+**Priority**: Medium
+**Dependencies**: FEAT-7.0
+**Estimated Effort**: Large
+
+**Scope**:
+- Discount code model
+- Code validation at checkout
+- Percentage and fixed discounts
+- Usage limits and expiration
+
+---
+
+### FEAT-12.0: Search with Filters
+**Priority**: Low
+**Dependencies**: FEAT-2.0
+**Estimated Effort**: Medium
+
+**Scope**:
+- Full-text search
+- Category filtering
+- Price range filtering
+- Sort options
+
+---
+
+## Feature Ideas (Backlog)
+
+- **FEAT-13.0**: Sales Dashboard - Admin analytics and reporting
+- **FEAT-14.0**: Bulk Product Import - CSV/Excel import for products
+- **FEAT-15.0**: Shipping Integration - Carrier API integration
+
+---
 
 ## Blocked Items
 
 None currently.
-
-## Next Steps After Feature 7
-
-1. Complete Feature 7 integration tests
-2. Merge Feature 7 to main
-3. Address T-015 (N+1 query performance)
-4. Start Feature 8 planning (order history)

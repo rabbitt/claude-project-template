@@ -52,7 +52,7 @@ export ANTHROPIC_API_KEY="your-api-key-here"
 
 ```bash
 # Clone to a temporary location
-git clone https://github.com/your-username/claude-project-template.git /tmp/template
+git clone https://github.com/~rabbitt/claude-project-template.git /tmp/template
 
 # Copy files to your project
 cp -r /tmp/template/CLAUDE.md /tmp/template/docs your-project/
@@ -267,30 +267,11 @@ before we continue.
 
 ---
 
-## Alternative: ChatGPT CLI Setup
+## Using with Other AI Assistants
 
-If you prefer using OpenAI's ChatGPT:
+While this template is designed for Claude Code, the workflow concepts apply to any AI coding assistant. If you're using ChatGPT or another tool, you'll need to adapt how context is provided (e.g., using ChatGPT's memory features or manually pasting relevant file contents at session start).
 
-### Installation
-
-```bash
-# Using pip
-pip install chatgpt-cli
-
-# Or using npm
-npm install -g chatgpt-cli
-```
-
-### Authentication
-
-```bash
-# Set your OpenAI API key
-export OPENAI_API_KEY="your-api-key-here"
-```
-
-### Usage
-
-The workflow process is the same - just use your preferred AI tool. The key is the documentation structure and approval-gated workflow, not the specific AI.
+The key is the documentation structure and approval-gated workflow, not the specific AI tool.
 
 ---
 

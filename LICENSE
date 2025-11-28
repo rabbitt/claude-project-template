@@ -1,6 +1,6 @@
 Creative Commons Attribution 4.0 International (CC BY 4.0)
 
-Copyright (c) 2024
+Copyright (c) 2024 Carl Corliss
 
 You are free to:
 
@@ -31,3 +31,20 @@ Notices:
   material.
 
 Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+-------------------------------------------------------------------------------
+
+CLARIFICATION OF INTENT:
+
+This template is licensed under CC-BY-4.0 for redistribution and derivative
+works. If you fork this template, create a derivative template, or redistribute
+it, attribution is required.
+
+However, no attribution is required when using these files as configuration
+in your own projects. Think of this like a compiler or build tool - you don't
+credit the tool in your output. Copying CLAUDE.md and the docs/ structure into
+your project to use this workflow does not require attribution.
+
+In short:
+- Forking/redistributing the template itself → Attribution required
+- Using the template files in your own project → No attribution needed

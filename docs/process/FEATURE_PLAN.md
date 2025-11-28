@@ -6,21 +6,29 @@
   This file tracks your feature roadmap. Update it as features progress.
 
   Sections:
-  - Current Status: Quick reference to what's active
   - Completed Features: History with commit references
   - Current Feature: What's being worked on now
   - Planned Features: What's coming next
+
+  NOTE: "Current Status" lives in CLAUDE.md (the index into work).
+  This file contains the work details themselves.
 
   Keep completed features for context - they help the AI understand
   what patterns have been established.
 -->
 
-## Current Status
+## ID Conventions
 
-- **Active Feature**: Feature 1 - [Feature Name]
-- **Branch**: `feature/[branch-name]`
-- **Progress**: [Brief status]
-- **Next Up**: Feature 2 - [Feature Name]
+**Features** use `FEAT-X.Y` format with optional letter suffix for sub-features:
+- `FEAT-1.0`, `FEAT-2.0`, `FEAT-3.0` for main features
+- `FEAT-1.5` for insertions (e.g., tangent converted to feature between 1.0 and 2.0)
+- `FEAT-2.0A`, `FEAT-2.0B` for sub-features
+
+**Tangents** use `TAN-XXX` format (simple increment):
+- `TAN-001`, `TAN-002`, `TAN-003`
+- When converted to a feature, mark as "Converted to FEAT-X.Y"
+
+This provides stable references that don't change if items are renamed, with insertion slots for features.
 
 ---
 
@@ -34,7 +42,7 @@
 *No features completed yet.*
 
 <!-- Example of completed feature:
-### Feature 0: Project Setup ✅
+### FEAT-1.0: Project Setup ✅
 **Branch**: `feature/project-setup` (merged)
 **Commit**: `abc1234`
 **Completed**: [Date]
@@ -45,7 +53,7 @@
 
 ## Current Feature
 
-### Feature 1: [Feature Name]
+### FEAT-1.0: [Feature Name]
 **Branch**: `feature/[branch-name]`
 **Status**: 🔄 In Progress
 **Priority**: High
@@ -78,9 +86,9 @@
   Include enough detail to understand scope without being exhaustive.
 -->
 
-### Feature 2: [Feature Name]
+### FEAT-2.0: [Feature Name]
 **Priority**: [High/Medium/Low]
-**Dependencies**: Feature 1
+**Dependencies**: FEAT-1.0
 **Estimated Effort**: [Small/Medium/Large]
 
 **Scope**:
@@ -88,7 +96,7 @@
 
 ---
 
-### Feature 3: [Feature Name]
+### FEAT-3.0: [Feature Name]
 **Priority**: [High/Medium/Low]
 **Dependencies**: [None or list dependencies]
 **Estimated Effort**: [Small/Medium/Large]
@@ -118,11 +126,11 @@
 -->
 
 ```
-Feature 1 (Setup)
-    └── Feature 2 (Core)
-            ├── Feature 3 (Extension A)
-            └── Feature 4 (Extension B)
-                    └── Feature 5 (Advanced)
+FEAT-1.0 (Setup)
+    └── FEAT-2.0 (Core)
+            ├── FEAT-3.0 (Extension A)
+            └── FEAT-4.0 (Extension B)
+                    └── FEAT-5.0 (Advanced)
 ```
 
 ---

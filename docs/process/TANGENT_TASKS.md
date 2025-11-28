@@ -33,6 +33,14 @@ A tangent is work that:
 
 ---
 
+## ID Convention
+
+Tangents use `TAN-XXX` format (simple increment): `TAN-001`, `TAN-002`, `TAN-003`
+
+When a tangent is converted to a feature, mark it as "Converted to FEAT-X.Y" in the resolution.
+
+---
+
 ## Current Tangents
 
 <!--
@@ -44,8 +52,8 @@ A tangent is work that:
 
 <!-- Example tangent entry:
 
-### Error Handling Inconsistency
-**Origin Feature**: Feature 3 - API Endpoints
+### TAN-001: Error Handling Inconsistency
+**Origin Feature**: FEAT-3.0 - API Endpoints
 **Discovered**: [Date]
 **Priority**: Medium
 **Status**: Discovered
@@ -66,7 +74,7 @@ Standardize on exceptions with a custom error hierarchy. Would need to:
 - Update existing handlers
 - Add error middleware
 
-**Breadcrumb**: Return to Feature 3 - API Endpoints after documenting.
+**Breadcrumb**: Return to FEAT-3.0 - API Endpoints after documenting.
 
 -->
 
@@ -77,11 +85,11 @@ Standardize on exceptions with a custom error hierarchy. Would need to:
 When documenting a new tangent, include:
 
 ```markdown
-### [Descriptive Title]
-**Origin Feature**: [Feature that was being worked on when this was discovered]
+### TAN-XXX: [Descriptive Title]
+**Origin Feature**: [FEAT-X.Y that was being worked on when this was discovered]
 **Discovered**: [Date]
 **Priority**: [High/Medium/Low]
-**Status**: [Discovered/Planned/In Progress/Completed/Deferred]
+**Status**: [Discovered/Planned/In Progress/Completed/Converted/Deferred]
 
 **Description**:
 [What the issue/opportunity is]
@@ -108,17 +116,17 @@ When documenting a new tangent, include:
 
 <!-- Example completed tangent:
 
-### Database Connection Pooling ✅
-**Origin Feature**: Feature 2 - Core API
+### TAN-002: Database Connection Pooling ✅
+**Origin Feature**: FEAT-2.0 - Core API
 **Resolved**: [Date]
-**Resolution**: Converted to Feature 2.5 and implemented
+**Resolution**: Converted to FEAT-2.5 and implemented
 
 **Original Issue**:
 Database connections were being created per-request, causing performance
 issues under load.
 
 **How Resolved**:
-Created Feature 2.5 (Database Connection Pooling), implemented pooling
+Created FEAT-2.5 (Database Connection Pooling), implemented pooling
 with configurable limits. Merged in commit `def5678`.
 
 -->
@@ -136,8 +144,8 @@ with configurable limits. Merged in commit `def5678`.
 
 <!-- Example deferred tangent:
 
-### TypeScript Migration
-**Origin Feature**: Feature 1 - Project Setup
+### TAN-003: TypeScript Migration
+**Origin Feature**: FEAT-1.0 - Project Setup
 **Deferred**: [Date]
 **Reason**: Project scope doesn't justify migration cost
 
@@ -180,5 +188,5 @@ Consider migrating from JavaScript to TypeScript for better type safety.
 Always note what you were working on when the tangent was discovered.
 This helps you (and the AI) return to the main work after documenting.
 
-Example: "Breadcrumb: Return to Feature 3 - API Endpoints, specifically
+Example: "Breadcrumb: Return to FEAT-3.0 - API Endpoints, specifically
 the /users endpoint validation logic."
